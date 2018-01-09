@@ -7,6 +7,7 @@ from urllib.request import urlretrieve
 
 import io
 import lxml.html as lhtml
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from ...importers import CSVImporter
@@ -16,8 +17,7 @@ from ...models import Institution
 class Command(BaseCommand):
     help = 'Import SIREN database'
     base_url = 'http://files.data.gouv.fr/sirene/'
-    local_csv_path = '/tmp'
-    re_extracted_from = r'(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{0,2})'
+    local_csv_path = getattr(settings, 'DJANGO_SIRENE_LOCAL_PATH', '/tmp')
 
     def add_arguments(self, parser):
         parser.add_argument('--at', action='store', type=str,
@@ -26,8 +26,6 @@ class Command(BaseCommand):
     def _import_csv(self, data, import_headquarters, batch_size=100):
         rows = io.TextIOWrapper(data, 'iso-8859-1')
         rows = csv.DictReader(rows, delimiter=';')
-        # skip header from loop
-        next(rows)
 
         CSVImporter(
             rows,
@@ -129,4 +127,4 @@ class Command(BaseCommand):
 
             zfile.close()
 
-        # TODO: Delete old zip
+        # TODO: Delete old zip from settings DJANGO_SIRENE_DAYS_TO_KEEP_FILES

@@ -55,7 +55,7 @@ class Institution(models.Model):
         LegalStatus, related_name='institutions', on_delete=models.PROTECT)
     municipality = models.ForeignKey(
         Municipality, related_name='institutions', on_delete=models.PROTECT)
-    name = models.CharField(max_length=38, help_text='NOMENLONG')
+    name = models.CharField(max_length=38, help_text='NOMEN_LONG')
     siret = models.CharField(
         max_length=14,
         db_index=True,

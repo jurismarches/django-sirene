@@ -37,8 +37,7 @@ class ImportStockSirenTestCase(TestCase):
             'DCRET': '20171001',
             'DEPET': '44',
             'EFETCENT': '100',
-            'L1_NORMALISEE': 'INSTITUTION TEST',
-            'L2_NORMALISEE': 'INSTITUTION TEST',
+            'ENSEIGNE': 'INSTITUTION TEST',
             'L4_NORMALISEE': '75 RUE NORBERT DUPONT',
             'LIBAPET': 'Administration',
             'LIBCOM': 'NANTES',
@@ -162,8 +161,7 @@ class ImportUpdateFileTestCase(TestCase):
             'DCRET': '20171001',
             'DEPET': '44',
             'EFETCENT': '100',
-            'L1_NORMALISEE': 'INSTITUTION TEST',
-            'L2_NORMALISEE': 'INSTITUTION TEST',
+            'ENSEIGNE': 'INSTITUTION TEST',
             'L4_NORMALISEE': '75 RUE NORBERT DUPONT',
             'LIBAPET': 'Administration',
             'LIBCOM': 'NANTES',
@@ -208,7 +206,7 @@ class ImportUpdateFileTestCase(TestCase):
         row = _get_row_from_object(dbo)
         row.update({
             'VMAJ': 'F',
-            'L1_NORMALISEE': dbo.name + chars
+            'NOMEN_LONG': dbo.name + chars
         })
         self.assertNotIn(chars, dbo.name)
         CSVImporter([row], filename=self.filename).run()
@@ -223,7 +221,7 @@ class ImportUpdateFileTestCase(TestCase):
         row = _get_row_from_object(dbo)
         row.update({
             'VMAJ': 'I',
-            'L1_NORMALISEE': dbo.name + chars
+            'NOMEN_LONG': dbo.name + chars
         })
         self.assertNotIn(chars, dbo.name)
         CSVImporter([row], filename=self.filename).run()

@@ -1,8 +1,10 @@
 # django-sirene
 
 
-Include [SIRENE](https://www.sirene.fr/sirene/public/accueil) database in your
-Django project.
+Include [SIRENE](https://www.data.gouv.fr/fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/)
+database in your Django project.
+
+All fields are not retrieved yet but why not add yours :).
 
 ## Usage
 
@@ -12,14 +14,23 @@ Django project.
 pip install django-sirene
 ```
 
+##### Settings
+
 Add `django_sirene` to your installed apps.
+
+These are settings you will want to redefine::
+
+| Setting                            | Default | Details                                                 |
+| ---------------------------------- | ------- | ------------------------------------------------------- |
+| `DJANGO_SIRENE_LOCAL_PATH`         | `/tmp`  | define where files will be downloaded                   |
+| `DJANGO_SIRENE_DAYS_TO_KEEP_FILES` | `30`    | define how many days you want to keep downloaded files  |
 
 Make the migration
 ```
 manage.py migrate django_sirene
 ```
 
-### Populate database
+### Populate database
 
 ```
 manage.py populate_sirene_database

@@ -37,7 +37,7 @@ class CSVImporter:
         ('COMET', 'municipality_id'),
         ('DEPET', 'department'),
         ('EFETCENT', 'workforce'),
-        ('NOMENLONG', 'name'),
+        ('NOMEN_LONG', 'name'),
         ('ENSEIGNE', 'commercial_name'),
         ('L4_NORMALISEE', 'address'),
         ('NJ', 'legal_status_id'),
@@ -137,6 +137,8 @@ class CSVImporter:
 
         :param params: dict containing attr of future institution instance
         :param row: dict containing the current row from csv {column: value}
+
+        TODO: Create update method to update label of relateds
         """
         # prepare precreate municipality if needed
         if params['municipality_id'] not in self.db_municipalities_code:
