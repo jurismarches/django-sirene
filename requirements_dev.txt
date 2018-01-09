@@ -1,0 +1,11 @@
+# This app
+-e .
+
+# Dependencies
+Django
+
+# Testing
+coverage
+factory-boy
+flake8
+
