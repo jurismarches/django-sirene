@@ -41,7 +41,7 @@ class Institution(models.Model):
     activity = models.ForeignKey(
         Activity, related_name='institutions', on_delete=models.PROTECT)
     address = models.CharField(max_length=38, help_text='L4_NORMALISEE')
-    commercial_name = models.CharField(max_length=38, help_text='ENSEIGNE')
+    commercial_name = models.CharField(max_length=50, help_text='ENSEIGNE')
     creation_date = models.DateField(help_text='DCRET', null=True)
     department = models.CharField(max_length=2, help_text='DEPET')
     headquarter = models.ForeignKey(
@@ -55,7 +55,7 @@ class Institution(models.Model):
         LegalStatus, related_name='institutions', on_delete=models.PROTECT)
     municipality = models.ForeignKey(
         Municipality, related_name='institutions', on_delete=models.PROTECT)
-    name = models.CharField(max_length=38, help_text='NOMEN_LONG')
+    name = models.CharField(max_length=131, help_text='NOMEN_LONG')
     siret = models.CharField(
         max_length=14,
         db_index=True,
