@@ -13,7 +13,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'django-bulk-update>=2.2.0',
-        'django-elasticsearch-dsl>=0.4.4'
+        'django-elasticsearch-dsl>=0.4.4',
         'lxml',
     ],
     include_package_data=True,
