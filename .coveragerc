@@ -1,6 +1,0 @@
-[run]
-source = django_sirene
-branch = 1
-
-[report]
-omit = *tests*,*migrations*

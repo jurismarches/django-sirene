@@ -7,7 +7,7 @@ class InstitutionAdmin(admin.ModelAdmin):
         'siret',
     )
     list_select_related = (
-        # 'leagal_status',
+        'legal_status',
         'headquarter',
         'municipality',
         'activity',

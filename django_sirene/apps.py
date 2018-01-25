@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class SirenConfig(AppConfig):
+class DjangoSireneConfig(AppConfig):
     name = 'django_sirene'

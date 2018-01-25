@@ -4,6 +4,10 @@
 # Dependencies
 Django
 
+# Optionnals
+django-elasticsearch-dsl
+elasticsearch-dsl>=2.0,<3.0
+
 # Testing
 coverage
 factory-boy

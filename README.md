@@ -53,14 +53,12 @@ docker exec -ti CONTAINER_ID bash
 
 ### Test django admin
 
-#### Create superuser
+Create superuser
 ```
 example/manage.py createsuperuser
-
 ```
 
-#### Run django server
-
+ Run django server
 ```
 example/manage.py runserver 0:8000
 ```
@@ -68,5 +66,5 @@ example/manage.py runserver 0:8000
 ### Run tests
 
 ```
-DJANGO_SETTINGS_MODULE=test_settings django-admin test django_sirene.tests
+make tests
 ```
