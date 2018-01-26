@@ -1,4 +1,4 @@
-from django_elasticsearch_dsl import DocType, fields
+from django_elasticsearch_dsl import fields
 
 from .models import Activity, Institution, LegalStatus, Municipality
 
@@ -8,7 +8,7 @@ _properties_code_name = {
 }
 
 
-class InstitutionDocument(DocType):
+class InstitutionDocumentMixin:
 
     name = fields.StringField(
         analyzer='french',
@@ -25,7 +25,6 @@ class InstitutionDocument(DocType):
 
     class Meta:
         model = Institution
-        index = 'institution'
         fields = [
             'address',
             'department',
@@ -35,6 +34,7 @@ class InstitutionDocument(DocType):
             'siret',
             'zipcode',
         ]
+        queryset_pagination = 10000
 
         related_models = (
             LegalStatus,
