@@ -85,6 +85,7 @@ class CSVImporter:
         params.update({
             field_db: row[field_row]
             for field_row, field_db in self.CSV_AUTO_FIELDS_MAPPING
+            if row[field_row]
         })
 
         vmaj = row.get('VMAJ', '').upper()
@@ -141,7 +142,8 @@ class CSVImporter:
         TODO: Create update method to update label of relateds
         """
         # prepare precreate municipality if needed
-        if params['municipality_id'] not in self.db_municipalities_code:
+        municipality_id = params.get('municipality_id')
+        if municipality_id and municipality_id not in self.db_municipalities_code:
             municipality = Municipality(
                 code=params['municipality_id'],
                 name=row['LIBCOM']
@@ -150,18 +152,20 @@ class CSVImporter:
             self.db_municipalities_code.add(municipality.code)
 
         # prepare precreate activities if needed
-        if params['activity_id'] not in self.db_activities_code:
+        activity_id = params.get('activity_id')
+        if activity_id and activity_id not in self.db_activities_code:
             activity = Activity(
-                code=params['activity_id'],
+                code=activity_id,
                 name=row['LIBAPET']
             )
             self.relateds_to_create.add(activity)
             self.db_activities_code.add(activity.code)
 
         # prepare precreate legal_status if needed
-        if params['legal_status_id'] not in self.db_legal_statuses_code:
+        legal_status_id = params.get('legal_status_id')
+        if legal_status_id and legal_status_id not in self.db_legal_statuses_code:
             legal_status = LegalStatus(
-                code=params['legal_status_id'],
+                code=legal_status_id,
                 name=row['LIBNJ']
             )
             self.relateds_to_create.add(legal_status)

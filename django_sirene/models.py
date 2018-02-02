@@ -12,7 +12,7 @@ class Activity(models.Model):
     name = models.CharField(max_length=65, help_text='LIBAPET')
 
     def __str__(self):
-        return self.name
+        return '{} ({})'.format(self.name, self.code)
 
 
 class Municipality(models.Model):
@@ -22,7 +22,7 @@ class Municipality(models.Model):
     name = models.CharField(max_length=32, help_text='LIBCOM')
 
     def __str__(self):
-        return self.name
+        return '{} ({})'.format(self.name, self.code)
 
 
 class LegalStatus(models.Model):
@@ -32,14 +32,18 @@ class LegalStatus(models.Model):
     name = models.CharField(max_length=100, help_text='LIBNJ')
 
     def __str__(self):
-        return self.name
+        return '{} ({})'.format(self.name, self.code)
 
 
 class Institution(models.Model):
     """
     """
     activity = models.ForeignKey(
-        Activity, related_name='institutions', on_delete=models.PROTECT)
+        Activity,
+        related_name='institutions',
+        on_delete=models.PROTECT,
+        null=True,
+    )
     address = models.CharField(max_length=38, help_text='L4_NORMALISEE')
     commercial_name = models.CharField(max_length=50, help_text='ENSEIGNE')
     creation_date = models.DateField(help_text='DCRET', null=True)
@@ -52,9 +56,17 @@ class Institution(models.Model):
     )
     is_headquarter = models.BooleanField(default=False)
     legal_status = models.ForeignKey(
-        LegalStatus, related_name='institutions', on_delete=models.PROTECT)
+        LegalStatus,
+        related_name='institutions',
+        on_delete=models.PROTECT,
+        null=True,
+    )
     municipality = models.ForeignKey(
-        Municipality, related_name='institutions', on_delete=models.PROTECT)
+        Municipality,
+        related_name='institutions',
+        on_delete=models.PROTECT,
+        null=True,
+    )
     name = models.CharField(max_length=131, help_text='NOMEN_LONG')
     siret = models.CharField(
         max_length=14,

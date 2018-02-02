@@ -147,6 +147,23 @@ class ImportStockSirenTestCase(TestCase):
             [r['CODPOS'] for r in rows]
         )
 
+    def test_import_institutions_with_empty_value_as_related_dont_create_related(self):
+        """Assert related can't have an empty value as code
+        """
+        row = self.base_row.copy()
+        row.update({
+            'NJ': '',
+            'LIBNJ': '',
+            'APET700': '',
+            'LIBAPET': '',
+            'COMET': '',
+            'LIBCOM': '',
+        })
+        CSVImporter([row], filename=self.filename).run()
+        self.assertEqual(
+            Institution.objects.filter(legal_status__isnull=True).count(), 1
+        )
+
 
 class ImportUpdateFileTestCase(TestCase):
 
