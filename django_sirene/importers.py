@@ -292,9 +292,8 @@ class CSVImporter:
             if self.log and i % self.local_batch_size == 0:
                 end = time.time()
                 items_by_sec = self.local_batch_size / (end - start)
-                print(
+                logger.debug(
                     'Treated {} rows ({:0.0f} items/sec)'.format(i, items_by_sec),
-                    end='\r'
                 )
                 start = time.time()
 
