@@ -69,8 +69,6 @@ class CSVImporter:
         return bool(int(row['SIEGE']))
 
     def _prepare_institution_params(self, row):
-        # TODO: MAJ
-        # stock = file_is_stock(filename)
 
         creation_date = None
         if row['DCRET']:
@@ -111,6 +109,23 @@ class CSVImporter:
 
         return params
 
+    def _get_paginated_instutitions(self, batch_size):
+        pks = Institution.objects.values_list('pk', flat=True).order_by()
+        len_pks = len(pks)
+        for start_index in range(0, len_pks, self.db_batch_size):
+            end_index = start_index + self.db_batch_size
+            if end_index >= len_pks:
+                end_index = len_pks - 1
+            qs_institutions = Institution.objects.filter(
+                pk__range=(pks[start_index], pks[end_index])
+            ).values_list(
+                'pk',
+                'siret',
+                'is_headquarter',
+                'is_expired',
+            )
+            yield qs_institutions
+
     def _preload_data(self):
         """Load in memory some data from db
         """
@@ -120,15 +135,13 @@ class CSVImporter:
         self.db_legal_statuses_code = set(LegalStatus.objects.values_list('code', flat=True))
         self.db_municipalities_code = set(Municipality.objects.values_list('code', flat=True))
 
-        qs_institutions = Institution.objects.values_list(
-            'pk', 'siret', 'is_headquarter', 'is_expired'
-        ).iterator()
-        for pk, siret, is_headquarter, is_expired in qs_institutions:
-            # take expired too to re-enable it if needed (deleted then created)
-            self.db_all_sirets.add(siret)
-            # but only headquarter not expired
-            if is_headquarter and not is_expired:
-                self.db_headquarters[get_siren(siret)] = pk
+        for page in self._get_paginated_instutitions(self.db_batch_size):
+            for pk, siret, is_headquarter, is_expired in page:
+                # take expired too to re-enable it if needed (deleted then created)
+                self.db_all_sirets.add(siret)
+                # but only headquarter not expired
+                if is_headquarter and not is_expired:
+                    self.db_headquarters[get_siren(siret)] = pk
 
         end = time.time()
         logger.debug("Preload ran in {:0.0f}s".format(end - start))
@@ -145,7 +158,7 @@ class CSVImporter:
         municipality_id = params.get('municipality_id')
         if municipality_id and municipality_id not in self.db_municipalities_code:
             municipality = Municipality(
-                code=params['municipality_id'],
+                code=municipality_id,
                 name=row['LIBCOM']
             )
             self.relateds_to_create.add(municipality)
