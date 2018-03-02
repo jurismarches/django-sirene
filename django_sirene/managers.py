@@ -3,6 +3,7 @@ from django_bulk_update.query import BulkUpdateQuerySet
 
 class InstitutionQuerySet(BulkUpdateQuerySet):
 
+    # field name to exclude
     excluded_fields = frozenset([
         'id',
         'updated',
@@ -11,11 +12,11 @@ class InstitutionQuerySet(BulkUpdateQuerySet):
 
     def __init__(self, model=None, query=None, using=None, hints=None):
         super().__init__(model, query, using, hints)
-        self.update_fields = [
-            f.name
-            for f in self.model._meta.fields
-            if f.name not in self.excluded_fields
-        ]
+        self.update_fields = set()
+        for f in self.model._meta.fields:
+            if f.name not in self.excluded_fields:
+                self.update_fields.add(f.name)
+                self.update_fields.add(f.column)
 
     def headquarters(self):
         return self.filter(is_headquarter=True)

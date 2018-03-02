@@ -16,7 +16,7 @@ class ActivityFactory(factory.DjangoModelFactory):
 
 
 class MunicipalityFactory(factory.DjangoModelFactory):
-    code = fuzzy.FuzzyText(length=3)
+    code = fuzzy.FuzzyText(length=5)
     name = fuzzy.FuzzyText(length=10)
 
     class Meta:

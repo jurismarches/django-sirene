@@ -3,7 +3,7 @@ from django.test import TestCase
 from ..helpers import get_siren
 from ..importers import CSVImporter
 from ..models import Institution
-from .factories import InstitutionFactory
+from .factories import InstitutionFactory, MunicipalityFactory
 
 
 def _get_row_from_object(obj):
@@ -33,7 +33,7 @@ class ImportStockSirenTestCase(TestCase):
         cls.base_row = {
             'APET700': '9499Z',
             'CODPOS': '44000',
-            'DEPCOMEN': '206',
+            'DEPCOMEN': '44109',
             'DCRET': '20171001',
             'DEPET': '44',
             'EFETCENT': '100',
@@ -124,27 +124,41 @@ class ImportStockSirenTestCase(TestCase):
         )
 
     def test_import_institutions_can_update_db(self):
-        """Assert we can update institutions when import from csv and there is
-        only one update query
+        """Assert we can update institutions when import from csv
         """
-        rows = []
-        for i in range(10):
+        dbo = InstitutionFactory()
 
-            dbo = InstitutionFactory()
-            row = _get_row_from_object(dbo)
+        row = _get_row_from_object(dbo)
 
-            new_zipcode = str(int(dbo.zipcode) + 1).zfill(5)
-            row.update({
-                'CODPOS': new_zipcode,
-            })
-            rows.append(row)
+        new_municipality_code = '00000'
+        new_legal_status_code = '0000'
+        new_activity_code = '00000'
+        new_zipcode = str(int(dbo.zipcode) + 1).zfill(5)
 
-        # with self.assertNumQueries(7):  # 6 selects + 1 update
-        CSVImporter(rows, filename=self.filename).run()
+        row.update({
+            'CODPOS': new_zipcode,
+            'DEPCOMEN': new_municipality_code,
+            'APET700': new_activity_code,
+            'NJ': new_legal_status_code,
+        })
 
-        self.assertListEqual(
-            list(Institution.objects.values_list('zipcode', flat=True)),
-            [r['CODPOS'] for r in rows]
+        CSVImporter([row], filename=self.filename).run()
+
+        self.assertEqual(
+            Institution.objects.get().zipcode,
+            new_zipcode
+        )
+        self.assertEqual(
+            Institution.objects.get().municipality_id,
+            new_municipality_code
+        )
+        self.assertEqual(
+            Institution.objects.get().activity_id,
+            new_activity_code
+        )
+        self.assertEqual(
+            Institution.objects.get().legal_status_id,
+            new_legal_status_code
         )
 
     def test_import_institutions_with_empty_value_as_related_dont_create_related(self):
@@ -174,7 +188,7 @@ class ImportUpdateFileTestCase(TestCase):
         cls.base_row = {
             'APET700': '9499Z',
             'CODPOS': '44000',
-            'DEPCOMEN': '206',
+            'DEPCOMEN': '44109',
             'DCRET': '20171001',
             'DEPET': '44',
             'EFETCENT': '100',
