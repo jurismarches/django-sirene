@@ -33,6 +33,12 @@ class Command(BaseCommand):
             dest='force',
             help='Force parse already parsed files'
         )
+        parser.add_argument(
+            '--dry',
+            action='store_true',
+            dest='dry',
+            help='Just show filename that will be parsed'
+        )
 
     def _import_csv(self, data, import_headquarters, batch_size=100):
         rows = io.TextIOWrapper(data, 'iso-8859-1')
@@ -103,6 +109,10 @@ class Command(BaseCommand):
 
         for filename in filenames:
 
+            if options['dry']:
+                print(filename)
+                continue
+
             filepath = os.path.join(self.local_csv_path, filename)
 
             if not os.path.exists(filepath):
@@ -125,7 +135,8 @@ class Command(BaseCommand):
                     print('Ignore file already parsed {}'.format(csv_filename))
                     continue
 
-            print('Parsing file {}'.format(csv_filename))
+            print('Ready to parse file {}'.format(csv_filename))
+
 
             # create just headquarters for now
             with zfile.open(csv_filename) as csv_file:
