@@ -34,7 +34,7 @@ class CSVImporter:
     CSV_AUTO_FIELDS_MAPPING = (
         ('APET700', 'activity_id'),
         ('CODPOS', 'zipcode'),
-        ('COMET', 'municipality_id'),
+        ('DEPCOMEN', 'municipality_id'),
         ('DEPET', 'department'),
         ('EFETCENT', 'workforce'),
         ('NOMEN_LONG', 'name'),

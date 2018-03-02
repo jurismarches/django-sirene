@@ -20,8 +20,19 @@ class Command(BaseCommand):
     local_csv_path = getattr(settings, 'DJANGO_SIRENE_LOCAL_PATH', '/tmp')
 
     def add_arguments(self, parser):
-        parser.add_argument('--at', action='store', type=str,
-                            help='Get DB at this date (YYYY-MM-DD)')
+        parser.add_argument(
+            '--at',
+            action='store',
+            type=str,
+            help='Get DB at this date (YYYY-MM-DD)'
+        )
+        parser.add_argument(
+            '--force',
+            '-f',
+            action='store_true',
+            dest='force',
+            help='Force parse already parsed files'
+        )
 
     def _import_csv(self, data, import_headquarters, batch_size=100):
         rows = io.TextIOWrapper(data, 'iso-8859-1')
@@ -109,9 +120,10 @@ class Command(BaseCommand):
             csv_filename = zfile.namelist()[0]
             assert os.path.splitext(csv_filename)[-1].lower() == '.csv'
 
-            if os.path.splitext(csv_filename)[0] in files_already_parsed:
-                print('Ignore file already parsed {}'.format(csv_filename))
-                continue
+            if not options['force']:
+                if os.path.splitext(csv_filename)[0] in files_already_parsed:
+                    print('Ignore file already parsed {}'.format(csv_filename))
+                    continue
 
             print('Parsing file {}'.format(csv_filename))
 

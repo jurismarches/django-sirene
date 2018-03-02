@@ -18,7 +18,7 @@ class Activity(models.Model):
 class Municipality(models.Model):
     """
     """
-    code = models.CharField(max_length=3, primary_key=True, help_text='COMET')
+    code = models.CharField(max_length=5, primary_key=True, help_text='DEPCOMEN')
     name = models.CharField(max_length=32, help_text='LIBCOM')
 
     def __str__(self):

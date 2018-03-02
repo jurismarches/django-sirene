@@ -33,7 +33,7 @@ class ImportStockSirenTestCase(TestCase):
         cls.base_row = {
             'APET700': '9499Z',
             'CODPOS': '44000',
-            'COMET': '206',
+            'DEPCOMEN': '206',
             'DCRET': '20171001',
             'DEPET': '44',
             'EFETCENT': '100',
@@ -156,7 +156,7 @@ class ImportStockSirenTestCase(TestCase):
             'LIBNJ': '',
             'APET700': '',
             'LIBAPET': '',
-            'COMET': '',
+            'DEPCOMEN': '',
             'LIBCOM': '',
         })
         CSVImporter([row], filename=self.filename).run()
@@ -174,7 +174,7 @@ class ImportUpdateFileTestCase(TestCase):
         cls.base_row = {
             'APET700': '9499Z',
             'CODPOS': '44000',
-            'COMET': '206',
+            'DEPCOMEN': '206',
             'DCRET': '20171001',
             'DEPET': '44',
             'EFETCENT': '100',

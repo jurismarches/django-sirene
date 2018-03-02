@@ -9,6 +9,9 @@ _properties_code_name = {
 
 
 class InstitutionDocumentMixin:
+    """TODO: Inherit from this class and DocType in your project to put institutions
+    in Elasticsearch index with django-elasticsearch-dsl
+    """
 
     name = fields.StringField(
         analyzer='french',
