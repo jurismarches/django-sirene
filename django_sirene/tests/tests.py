@@ -3,7 +3,7 @@ from django.test import TestCase
 from ..helpers import get_siren
 from ..importers import CSVImporter
 from ..models import Institution
-from .factories import InstitutionFactory, MunicipalityFactory
+from .factories import InstitutionFactory
 
 
 def _get_row_from_object(obj):

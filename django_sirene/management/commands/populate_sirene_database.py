@@ -137,7 +137,6 @@ class Command(BaseCommand):
 
             print('Ready to parse file {}'.format(csv_filename))
 
-
             # create just headquarters for now
             with zfile.open(csv_filename) as csv_file:
                 self._import_csv(csv_file, import_headquarters=True)

@@ -1,5 +1,6 @@
 # django-sirene
-
+[![CircleCI](https://circleci.com/gh/jurismarches/django-sirene.svg?style=svg)](https://circleci.com/gh/jurismarches/django-sirene)
+[![codecov](https://codecov.io/gh/jurismarches/django-sirene/branch/master/graph/badge.svg)](https://codecov.io/gh/jurismarches/django-sirene)
 
 Include [SIRENE](https://www.data.gouv.fr/fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/)
 database in your Django project.

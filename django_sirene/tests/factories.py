@@ -1,5 +1,4 @@
 import datetime
-import string
 
 import factory
 from factory import fuzzy

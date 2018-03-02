@@ -12,4 +12,5 @@ elasticsearch-dsl>=2.0,<3.0
 coverage
 factory-boy
 flake8
+codecov
 
