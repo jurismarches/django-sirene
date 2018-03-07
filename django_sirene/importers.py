@@ -17,17 +17,6 @@ class VMAJ:
     broadcast_out = 'O'
     broadcast_in = 'D'
 
-    update_mode = (
-        delete,
-        edit_final,
-        broadcast_out,
-        broadcast_in,
-    )
-
-    @classmethod
-    def is_update_mode(cls, code):
-        return code in cls.update_mode
-
 
 class CSVImporter:
 
