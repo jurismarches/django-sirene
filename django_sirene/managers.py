@@ -1,4 +1,7 @@
 from django_bulk_update.query import BulkUpdateQuerySet
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class InstitutionQuerySet(BulkUpdateQuerySet):
@@ -8,6 +11,7 @@ class InstitutionQuerySet(BulkUpdateQuerySet):
         'id',
         'updated',
         'created',
+        'siret',
     ])
 
     def __init__(self, model=None, query=None, using=None, hints=None):
@@ -29,6 +33,9 @@ class InstitutionQuerySet(BulkUpdateQuerySet):
 
         :param data: list Institutions
         """
+        if not objs:
+            return
+
         institutions_by_siret = {
             o.siret: o
             for o in objs
@@ -42,7 +49,18 @@ class InstitutionQuerySet(BulkUpdateQuerySet):
         for institution in institutions:
             obj = institutions_by_siret[institution.siret]
             for fieldname, value in obj.__dict__.items():
-                if fieldname in self.update_fields and getattr(institution, fieldname) != value:
+                if fieldname not in self.update_fields:
+                    continue
+
+                if str(getattr(institution, fieldname)) != str(value):
+                    logger.debug(
+                        'Add %s because %s change - old:%s, new:%s' % (
+                            institution.siret,
+                            fieldname,
+                            getattr(institution, fieldname),
+                            value,
+                        )
+                    )
                     siret_require_update.add(institution.siret)
                     break
 
