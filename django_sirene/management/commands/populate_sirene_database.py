@@ -81,7 +81,7 @@ class Command(BaseCommand):
 
         daily_filenames = []
         range_num_day = range(
-            int(at.replace(day=1).strftime('%j')),
+            int(at.replace(day=1).strftime('%j')) - 1,
             int(at.strftime('%j')) + 1
         )
         for i in range_num_day:
