@@ -98,23 +98,6 @@ class CSVImporter:
 
         return params
 
-    def _get_paginated_instutitions(self, batch_size):
-        pks = Institution.objects.values_list('pk', flat=True).order_by()
-        len_pks = len(pks)
-        for start_index in range(0, len_pks, self.db_batch_size):
-            end_index = start_index + self.db_batch_size
-            if end_index >= len_pks:
-                end_index = len_pks - 1
-            qs_institutions = Institution.objects.filter(
-                pk__range=(pks[start_index], pks[end_index])
-            ).values_list(
-                'pk',
-                'siret',
-                'is_headquarter',
-                'is_expired',
-            )
-            yield qs_institutions
-
     def _preload_data(self):
         """Load in memory some data from db
         """
