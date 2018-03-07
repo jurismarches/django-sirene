@@ -66,7 +66,7 @@ class CSVImporter:
         params = {
             'siret': row['SIREN'] + row['NIC'],
             'creation_date': creation_date,
-            'last_viewed_filename': self.filename,
+            'updated_from_filename': self.filename,
             'is_headquarter': self._is_headquarter(row),
         }
         params.update({
@@ -124,16 +124,15 @@ class CSVImporter:
         self.db_legal_statuses_code = set(LegalStatus.objects.values_list('code', flat=True))
         self.db_municipalities_code = set(Municipality.objects.values_list('code', flat=True))
 
-        for page in self._get_paginated_instutitions(self.db_batch_size):
-            for pk, siret, is_headquarter, is_expired in page:
+        qs = Institution.objects.values_list('id', 'siret', 'is_headquarter', 'is_expired')
+        for pk, siret, is_headquarter, is_expired in qs.iterator():
                 # take expired too to re-enable it if needed (deleted then created)
                 self.db_all_sirets.add(siret)
                 # but only headquarter not expired
                 if is_headquarter and not is_expired:
                     self.db_headquarters[get_siren(siret)] = pk
-
         end = time.time()
-        logger.debug("Preload ran in {:0.0f}s".format(end - start))
+        logger.debug("Preload finished after {:0.0f}s".format(end - start))
 
     def _prepare_relateds(self, params, row):
         """Add relateds instance to a list to create them in bulk later

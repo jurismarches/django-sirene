@@ -105,7 +105,7 @@ class Command(BaseCommand):
         files_already_parsed = set(
             list(
                 Institution.objects.values_list(
-                    'last_viewed_filename',
+                    'updated_from_filename',
                     flat=True
                 ).distinct()
             )

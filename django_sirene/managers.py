@@ -1,24 +1,31 @@
-from django_bulk_update.query import BulkUpdateQuerySet
+import datetime
 import logging
+
+from django_bulk_update.query import BulkUpdateQuerySet
 
 logger = logging.getLogger(__name__)
 
 
 class InstitutionQuerySet(BulkUpdateQuerySet):
 
-    # field name to exclude
-    excluded_fields = frozenset([
+    # fields excluded from update
+    exclude_update_fields = frozenset([
         'id',
-        'updated',
-        'created',
         'siret',
+        'created',
+    ])
+
+    # fields ignored from updated fields
+    ignored_updated_fields = frozenset([
+        'updated',
+        'updated_from_filename',
     ])
 
     def __init__(self, model=None, query=None, using=None, hints=None):
         super().__init__(model, query, using, hints)
         self.update_fields = set()
         for f in self.model._meta.fields:
-            if f.name not in self.excluded_fields:
+            if f.name not in self.exclude_update_fields:
                 self.update_fields.add(f.name)
                 self.update_fields.add(f.column)
 
@@ -49,7 +56,7 @@ class InstitutionQuerySet(BulkUpdateQuerySet):
         for institution in institutions:
             obj = institutions_by_siret[institution.siret]
             for fieldname, value in obj.__dict__.items():
-                if fieldname not in self.update_fields:
+                if fieldname not in self.update_fields - self.ignored_updated_fields:
                     continue
 
                 if str(getattr(institution, fieldname)) != str(value):
@@ -70,10 +77,11 @@ class InstitutionQuerySet(BulkUpdateQuerySet):
                 siret__in=siret_require_update
             )
             for institution in institutions_to_update:
-                obj = institutions_by_siret[institution.siret]
-                for fieldname, value in obj.__dict__.items():
+                new_institution = institutions_by_siret[institution.siret]
+                for fieldname, value in new_institution.__dict__.items():
                     if fieldname in self.update_fields:
                         setattr(institution, fieldname, value)
+                institution.updated = datetime.datetime.now()
 
             super().bulk_update(
                 institutions_to_update,

@@ -22,7 +22,7 @@ class InstitutionAdmin(admin.ModelAdmin):
         'is_expired',
         'updated',
         'created',
-        'last_viewed_filename',
+        'updated_from_filename',
     )
 
 

@@ -213,9 +213,14 @@ class ImportUpdateFileTestCase(TestCase):
             'VMAJ': 'E',
         })
         self.assertFalse(dbo.is_expired)
+        self.assertFalse(dbo.updated_from_filename)
+        old_date = dbo.updated
+
         CSVImporter([row], filename=self.filename).run()
         dbo.refresh_from_db()
         self.assertTrue(dbo.is_expired)
+        self.assertEqual(dbo.updated_from_filename, self.filename)
+        self.assertNotEqual(old_date, dbo.updated)
 
     def test_recreate_an_expired_institution(self):
         """

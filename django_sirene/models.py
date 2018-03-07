@@ -82,7 +82,7 @@ class Institution(models.Model):
     is_expired = models.BooleanField(default=False, help_text='Removed from database')
     is_hidden = models.BooleanField(default=False, help_text='Ask to be hidden')
     updated = models.DateTimeField(auto_now=True, help_text='Updated locally')
-    last_viewed_filename = models.CharField(max_length=255)
+    updated_from_filename = models.CharField(max_length=255)
 
     objects = InstitutionQuerySet.as_manager()
 
