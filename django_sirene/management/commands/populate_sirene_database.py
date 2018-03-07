@@ -1,5 +1,6 @@
 import csv
 import datetime
+import logging
 import os
 import zipfile
 from urllib.parse import urljoin
@@ -12,6 +13,9 @@ from django.core.management.base import BaseCommand
 
 from ...importers import CSVImporter
 from ...models import Institution
+
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -58,7 +62,7 @@ class Command(BaseCommand):
         :param filename: filename of file to download
         :param filepath: filepath to store downloaded file
         """
-        print('Downloading {} ...'.format(filename))
+        logger.debug('Downloading %s ...', filename)
         urlretrieve(urljoin(self.base_url, filename), filepath)
 
     def _get_filenames(self, at=datetime.date.today()):
@@ -119,11 +123,11 @@ class Command(BaseCommand):
                 self._download_file(filename, filepath)
                 zfile = zipfile.ZipFile(filepath, 'r')
             else:
-                print('Using already created local file {}'.format(filepath))
+                logger.debug('Using already created local file %s', filepath)
                 try:
                     zfile = zipfile.ZipFile(filepath, 'r')
                 except zipfile.BadZipfile:
-                    print('Failed to open already created local file {}'.format(filepath))
+                    logger.debug('Failed to open already created local file %s', filepath)
                     self._download_file(filename, filepath)
                     zfile = zipfile.ZipFile(filepath, 'r')
 
@@ -132,21 +136,22 @@ class Command(BaseCommand):
 
             if not options['force']:
                 if os.path.splitext(csv_filename)[0] in files_already_parsed:
-                    print('Ignore file already parsed {}'.format(csv_filename))
+                    logger.debug('Ignore file already parsed %s', csv_filename)
                     continue
 
-            print('Ready to parse file {}'.format(csv_filename))
+            logger.info('Ready to parse file %s', csv_filename)
 
             # create just headquarters for now
             with zfile.open(csv_filename) as csv_file:
                 self._import_csv(csv_file, import_headquarters=True)
 
-            print('--------------------------------------------------')
+            logger.debug('Import headquarted finshed')
 
             # then create subsidiaries
             with zfile.open(csv_filename) as csv_file:
                 self._import_csv(csv_file, import_headquarters=False)
 
+            logger.debug('Import subsidiaries finshed')
             zfile.close()
 
         # TODO: Delete old zip from settings DJANGO_SIRENE_DAYS_TO_KEEP_FILES

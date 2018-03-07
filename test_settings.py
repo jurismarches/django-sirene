@@ -12,3 +12,19 @@ DATABASES = {
 }
 INSTALLED_APPS = ('django_sirene',)
 MIDDLEWARE_CLASSES = ()
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django_sirene': {
+            'handlers': ['console'],
+            'level': os.getenv('LOG_LEVEL', 'INFO'),
+        },
+    },
+}
