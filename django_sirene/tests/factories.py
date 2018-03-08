@@ -38,7 +38,7 @@ class InstitutionFactory(factory.DjangoModelFactory):
     address = factory.Sequence(lambda n: '{} route vers Mars'.format(n))
     zipcode = '44000'
     department = '44'
-    workforce = str(fuzzy.FuzzyInteger(low=1, high=999999))
+    workforce = str(fuzzy.FuzzyInteger(low=1, high=999999).fuzz())
     creation_date = fuzzy.FuzzyDate(start_date=datetime.date(2000, 1, 1))
 
     municipality = factory.SubFactory(MunicipalityFactory)
