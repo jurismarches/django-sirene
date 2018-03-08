@@ -18,5 +18,5 @@ class CommandTestCase(TestCase):
             'sirene_2018064_E_Q.zip',
             'sirene_2018065_E_Q.zip',
         ]
-        result = Command()._get_filenames(at=datetime.date(2018, 3, 15))
+        result = Command()._get_filenames(at=datetime.date(2018, 3, 6))
         self.assertListEqual(result, expected)
