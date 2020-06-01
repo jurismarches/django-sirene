@@ -24,7 +24,6 @@ These are settings you will want to redefine::
 | Setting                            | Default | Details                                                 |
 | ---------------------------------- | ------- | ------------------------------------------------------- |
 | `DJANGO_SIRENE_LOCAL_PATH`         | `/tmp`  | define where files will be downloaded                   |
-| `DJANGO_SIRENE_DAYS_TO_KEEP_FILES` | `30`    | define how many days you want to keep downloaded files  |
 
 Make the migration
 ```

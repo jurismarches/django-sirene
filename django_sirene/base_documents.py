@@ -23,7 +23,7 @@ class InstitutionDocumentMixin:
     )
 
     legal_status = fields.ObjectField(properties=_properties_code_name)
-    activity = fields.ObjectField(properties=_properties_code_name)
+    municipality = fields.ObjectField(properties=_properties_code_name)
     activity = fields.ObjectField(properties=_properties_code_name)
 
     class Meta:

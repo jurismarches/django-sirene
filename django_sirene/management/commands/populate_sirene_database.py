@@ -1,157 +1,170 @@
 import csv
-import datetime
+import io
 import logging
 import os
 import zipfile
-from urllib.parse import urljoin
+from datetime import datetime
 from urllib.request import urlretrieve
 
-import io
-import lxml.html as lhtml
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from ...importers import CSVImporter
-from ...models import Institution
-
+from django_sirene.importers import CSVEtablissementImporter, CSVUniteLegaleImporter
 
 logger = logging.getLogger(__name__)
 
 
+uri_stocketablissement = "http://files.data.gouv.fr/insee-sirene/%sStockEtablissement_utf8.zip"
+uri_stockunitelegale = "http://files.data.gouv.fr/insee-sirene/%sStockUniteLegale_utf8.zip"
+
+filename_stocketablissement = "etablissement.zip"
+filename_stockunitelegale = "unitelegale.zip"
+
+
 class Command(BaseCommand):
-    help = 'Import SIREN database'
-    base_url = 'http://files.data.gouv.fr/sirene/'
-    local_csv_path = getattr(settings, 'DJANGO_SIRENE_LOCAL_PATH', '/tmp')
+    help = "Import SIREN database"
+    local_csv_path = getattr(settings, "DJANGO_SIRENE_LOCAL_PATH", "/tmp")
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--at',
-            action='store',
-            type=str,
-            help='Get DB at this date (YYYY-MM-DD)'
+            "--dry", action="store_true", dest="dry", help="Just show filename that will be parsed",
         )
         parser.add_argument(
-            '--force',
-            '-f',
-            action='store_true',
-            dest='force',
-            help='Force parse already parsed files'
+            "--force",
+            "-f",
+            action="store_true",
+            dest="force",
+            help="Force download files and parse every line",
         )
         parser.add_argument(
-            '--dry',
-            action='store_true',
-            dest='dry',
-            help='Just show filename that will be parsed'
+            "--skip-StockEtablissement",
+            action="store_true",
+            dest="skip_stocketablissement",
+            help="Do not download nor process the stock etablissement file",
+        )
+        parser.add_argument(
+            "--offset-StockEtablissement",
+            action="store",
+            dest="offset_etablissement",
+            help=("Ignore the first rows of the stock etablissement file"),
+        )
+        parser.add_argument(
+            "--skip-StockUniteLegale",
+            action="store_true",
+            dest="skip_stockunitelegale",
+            help="Do not download nor process the stock unité legale file",
+        )
+        parser.add_argument(
+            "--offset-StockUniteLegale",
+            action="store",
+            dest="offset_stock",
+            help=("Ignore the first rows of the stock unité legale file"),
+        )
+        parser.add_argument(
+            "--date-from",
+            action="store",
+            dest="date_from",
+            help=("Date from which files lines will be processed."
+                  "Default to one month ago."
+                  "Format 31/12/1970"),
+        )
+        parser.add_argument(
+            "--date-file",
+            action="store",
+            dest="date_file",
+            help=("Date to to the file to take"
+                  "Format 1970-12-31"),
         )
 
-    def _import_csv(self, data, import_headquarters, batch_size=100):
-        rows = io.TextIOWrapper(data, 'iso-8859-1')
-        rows = csv.DictReader(rows, delimiter=';')
+    def _import_csv(self, data, importer_class, **options):
+        rows = io.TextIOWrapper(data, "iso-8859-1")
+        rows = csv.DictReader(rows, delimiter=",")
 
-        CSVImporter(
+        try:
+            date_from = datetime.strptime(options["date_from"], "%d/%m/%Y")
+        except (TypeError, ValueError):
+            date_from = None
+
+        importer_class(
             rows,
-            filename=os.path.splitext(data.name)[0],
-            import_headquarters=import_headquarters,
-            batch_size=batch_size,
-            log=True
+            date_from=date_from,
+            offset=options.get("offset", "0"),
+            force=options.get("force"),
+            log=True,
         ).run()
 
-    def _download_file(self, filename, filepath):
-        """Retrieve a file from filename
+    def _download_file(self, uri, filepath):
+        """Retrieve a file from a uri
 
-        :param filename: filename of file to download
+        :param uri: uri of file to download
         :param filepath: filepath to store downloaded file
         """
-        logger.debug('Downloading %s ...', filename)
-        urlretrieve(urljoin(self.base_url, filename), filepath)
+        logger.debug("Downloading %s ...", uri)
+        urlretrieve(uri, filepath)
 
-    def _get_filenames(self, at=datetime.date.today()):
-        """Return list filenames to parse to have database at date pass as param
+    def _get_file(self, filename, uri, **options):
+        filepath = os.path.join(self.local_csv_path, filename)
 
-        :param at: Date on which we want database, default now
-        """
-        listing = lhtml.parse(self.base_url)
-        prev_month = at.replace(day=1) - datetime.timedelta(days=1)
-        last_month_filename = listing.xpath(
-            '//a[contains(text(), "{}{}_L_M")]/@href'.format(
-                prev_month.year,
-                str(prev_month.month).zfill(2)
-            )
-        )[-1]
+        if options.get("force"):
+            logger.debug("Downloading data to file %s", filepath)
+            self._download_file(uri, filepath)
+            return zipfile.ZipFile(filepath, "r")
 
-        daily_filenames = []
-        range_num_day = range(
-            int(at.replace(day=1).strftime('%j')) - 1,
-            int(at.strftime('%j')) + 1
-        )
-        for i in range_num_day:
-            filename = listing.xpath('//a[contains(text(), "{}{}_E_Q")]/@href'.format(
-                at.year,
-                str(i).zfill(3)
-            ))
-            if filename:
-                daily_filenames.append(filename[0])
+        try:
+            zfile = zipfile.ZipFile(filepath, "r")
+            logger.debug("Using known file %s", filepath)
+            return zfile
+        except (zipfile.BadZipFile, FileNotFoundError):
+            logger.debug("Failed to open local file %s", filepath)
+            logger.debug("Downloading data to file %s", filepath)
+            self._download_file(uri, filepath)
+            return zipfile.ZipFile(filepath, "r")
 
-        return [last_month_filename] + daily_filenames
+    def populate_with_file(self, filename, uri, importer_class, offset="0", **options):
+        if options["dry"]:
+            print("%s in %s" % (uri, filename))
+            return
+
+        zfile = self._get_file(filename, uri, **options)
+        csv_filename = zfile.namelist()[0]
+        assert os.path.splitext(csv_filename)[-1].lower() == ".csv"
+
+        try:
+            offset = int(offset)
+        except (TypeError, ValueError):
+            logger.warning("offset %s ignored", offset)
+            offset = 0
+        options["offset"] = offset
+
+        with zfile.open(csv_filename) as csv_file:
+            self._import_csv(csv_file, importer_class, **options)
+        zfile.close()
+
+        logger.info("%s imported", csv_filename)
 
     def handle(self, *args, **options):
-
-        if options.get('at'):
-            at = datetime.datetime.strptime(options['at'], '%Y-%m-%d')
-            filenames = self._get_filenames(at=at)
+        if options.get("date_file"):
+            date_file = options.get("date_file") + "-"
         else:
-            filenames = self._get_filenames()
+            date_file = ""
 
-        files_already_parsed = set(
-            list(
-                Institution.objects.values_list(
-                    'updated_from_filename',
-                    flat=True
-                ).distinct()
+        uri_stocketablissement_dated = uri_stocketablissement % date_file
+        uri_stockunitelegale_dated = uri_stockunitelegale % date_file
+
+        if not options["skip_stocketablissement"]:
+            self.populate_with_file(
+                filename_stocketablissement,
+                uri_stocketablissement_dated,
+                CSVEtablissementImporter,
+                offset=options.get("offset_etablissement") or 0,
+                **options,
             )
-        )
 
-        for filename in filenames:
-
-            if options['dry']:
-                print(filename)
-                continue
-
-            filepath = os.path.join(self.local_csv_path, filename)
-
-            if not os.path.exists(filepath):
-                self._download_file(filename, filepath)
-                zfile = zipfile.ZipFile(filepath, 'r')
-            else:
-                logger.debug('Using already created local file %s', filepath)
-                try:
-                    zfile = zipfile.ZipFile(filepath, 'r')
-                except zipfile.BadZipfile:
-                    logger.debug('Failed to open already created local file %s', filepath)
-                    self._download_file(filename, filepath)
-                    zfile = zipfile.ZipFile(filepath, 'r')
-
-            csv_filename = zfile.namelist()[0]
-            assert os.path.splitext(csv_filename)[-1].lower() == '.csv'
-
-            if not options['force']:
-                if os.path.splitext(csv_filename)[0] in files_already_parsed:
-                    logger.debug('Ignore file already parsed %s', csv_filename)
-                    continue
-
-            logger.info('Ready to parse file %s', csv_filename)
-
-            # create just headquarters for now
-            with zfile.open(csv_filename) as csv_file:
-                self._import_csv(csv_file, import_headquarters=True)
-
-            logger.debug('Import headquarted finshed')
-
-            # then create subsidiaries
-            with zfile.open(csv_filename) as csv_file:
-                self._import_csv(csv_file, import_headquarters=False)
-
-            logger.debug('Import subsidiaries finshed')
-            zfile.close()
-
-        # TODO: Delete old zip from settings DJANGO_SIRENE_DAYS_TO_KEEP_FILES
+        if not options["skip_stockunitelegale"]:
+            self.populate_with_file(
+                filename_stockunitelegale,
+                uri_stockunitelegale_dated,
+                CSVUniteLegaleImporter,
+                offset=options.get("offset_stock") or 0,
+                **options,
+            )

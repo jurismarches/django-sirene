@@ -119,7 +119,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -135,3 +135,21 @@ ES_CONNECTIONS = {
         }]
     }
 }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django_sirene': {
+            'handlers': ['console'],
+            'level': os.getenv('LOG_LEVEL', 'DEBUG'),
+        },
+    },
+}
+
+DJANGO_SIRENE_LOCAL_PATH = os.path.join(BASE_DIR, 'test_data')

@@ -13,6 +13,10 @@ class InstitutionQuerySet(BulkUpdateQuerySet):
         'id',
         'siret',
         'created',
+        # set later
+        'legal_status',
+        'headquarter',
+        'name',
     ])
 
     # fields ignored from updated fields
@@ -35,8 +39,9 @@ class InstitutionQuerySet(BulkUpdateQuerySet):
     def actives(self):
         return self.filter(is_expired=False)
 
-    def bulk_update(self, objs, batch_size=None):
+    def bulk_update_no_pk(self, objs, batch_size=None):
         """Find modified instances and build a queryset with them
+        Differs from django's bulk update because objs don't need to have a pk to be updated
 
         :param data: list Institutions
         """

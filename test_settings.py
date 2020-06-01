@@ -30,7 +30,7 @@ LOGGING = {
     'loggers': {
         'django_sirene': {
             'handlers': ['console'],
-            'level': os.getenv('LOG_LEVEL', 'INFO'),
+            'level': os.getenv('LOG_LEVEL', 'ERROR'),
         },
     },
 }
