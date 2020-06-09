@@ -3,6 +3,7 @@
 
 # Dependencies
 Django
+psycopg2
 
 # Optionnals
 django-elasticsearch-dsl

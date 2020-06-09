@@ -38,16 +38,17 @@ manage.py populate_sirene_database
 ```
 It will import the last 'stock' file then all next 'daily' files published.
 
-You can populate database at a past date with `at` parameter.
+You can see further option in the command help.
 ```
-manage.py populate_sirene_database --at '2017-11-30'
+manage.py populate_sirene_database --help'
 ```
 
 ## Contributing
 
-### Build, start and attach to docker container
+### Build, start docker container
 
 ```
+docker-compose build
 docker-compose up -d
 docker exec -ti CONTAINER_ID bash
 ```
@@ -56,16 +57,16 @@ docker exec -ti CONTAINER_ID bash
 
 Create superuser
 ```
-example/manage.py createsuperuser
+docker-compose exec sirene example/manage.py createsuperuser
 ```
 
  Run django server
 ```
-example/manage.py runserver 0:8000
+docker-compose exec sirene example/manage.py runserver 0:8000
 ```
 
 ### Run tests
 
 ```
-make tests
+docker-compose exec sirene make tests
 ```

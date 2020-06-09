@@ -13,7 +13,9 @@ RUN set -x && apt-get update && apt-get -y install \
     lib32z1-dev \
     # psycopg2
     libpq-dev \
-    postgresql-client
+    postgresql-client\
+    # wait for it
+    wait-for-it
 
 ADD requirements_dev.txt requirements_dev.txt
 
