@@ -11,20 +11,32 @@ services:
       - ./docker-data/postgresql/postgresql.conf:/etc/postgresql.conf
     command: postgres -c config_file=/etc/postgresql.conf
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: sirene
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
 
   sirene:
     build: .
     command: /bin/bash
+    env_file:
+      - ./.env
     volumes:
-      - .:/app
+      - ./entrypoint.sh:/app/entrypoint.sh
+      - ./Makefile:/app/Makefile
+      - ./django_sirene:/app/django_sirene
+      - ./example:/app/example
+      - ./requirements_dev.txt:/app/requirements_dev.txt
+      - ./setup.cfg:/app/setup.cfg
+      - ./setup.py:/app/setup.py
+      - ./test_settings.py:/app/test_settings.py
+
     ports:
       - "8000:8000"
     tty: true
     depends_on:
       - postgresql
+    entrypoint: /app/entrypoint.sh
+
 
 volumes:
   postgres-data:

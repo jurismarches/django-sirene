@@ -48,9 +48,8 @@ manage.py populate_sirene_database --help'
 ### Build, start docker container
 
 ```
+cp .env.sample .env
 docker-compose build
-docker-compose up -d
-docker exec -ti CONTAINER_ID bash
 ```
 
 ### Test django admin
@@ -68,5 +67,5 @@ docker-compose exec sirene example/manage.py runserver 0:8000
 ### Run tests
 
 ```
-docker-compose exec sirene make tests
+docker-compose run --rm sirene make tests
 ```

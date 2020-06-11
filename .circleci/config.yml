@@ -12,16 +12,15 @@ jobs:
       - run:
           name: Build the image(s)
           command: |
+            cp .env.sample .env
             docker-compose build
-            docker-compose up -d
-            docker-compose exec sirene wait-for-it postgresql:5432 -t 360
 
       - run:
           name: Run quality
           command: |
-            docker-compose exec sirene make quality
+            docker-compose run --rm sirene make quality
 
       - run:
           name: Run test and coverage
           command: |
-            docker-compose exec sirene  /bin/bash -c "make coverage; codecov --token=03f9df38-f1e3-4f0d-bfa1-0e8626319b14"
+            docker-compose run --rm sirene  /bin/bash -c "make coverage; codecov --token=03f9df38-f1e3-4f0d-bfa1-0e8626319b14"
