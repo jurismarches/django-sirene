@@ -163,3 +163,12 @@ class PopulateSireneDatabaseTest(TestCase):
             ('unitelegale.zip',
              'http://files.data.gouv.fr/insee-sirene/2020-01-02-StockUniteLegale_utf8.zip')
         )
+
+    @mock.patch("django_sirene.management.commands.populate_sirene_database.toggle_postgres_vacuum")
+    def test_db_vacuum_is_restored_even_when_import_fails(
+        self, mock_vaccum, mock_etablissement_importer, mock_unitelegale_importer, mock_get_file
+    ):
+        mock_get_file.side_effect = Exception
+        with self.assertRaises(Exception):
+            call_command(self.command, stdout=self.out)
+        self.assertTrue(mock_vaccum.called)

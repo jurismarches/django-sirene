@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from django_sirene.importers import CSVEtablissementImporter, CSVUniteLegaleImporter
+from django_sirene.db_utils import toggle_postgres_vacuum
 
 logger = logging.getLogger(__name__)
 
@@ -142,7 +143,7 @@ class Command(BaseCommand):
 
         logger.info("%s imported", csv_filename)
 
-    def handle(self, *args, **options):
+    def _handle(self, *args, **options):
         if options.get("date_file"):
             date_file = options.get("date_file") + "-"
         else:
@@ -168,3 +169,12 @@ class Command(BaseCommand):
                 offset=options.get("offset_stock") or 0,
                 **options,
             )
+
+    def handle(self, *args, **options):
+        try:
+            toggle_postgres_vacuum(autovacuum_enabled=False)
+            self._handle(*args, **options)
+        except Exception:
+            raise
+        finally:
+            toggle_postgres_vacuum(autovacuum_enabled=True)
