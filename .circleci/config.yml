@@ -1,26 +1,26 @@
 version: 2
 jobs:
   build:
-    docker:
-      - image: technekes/circleci
+    machine:
+      image: ubuntu-1604:201903-01
 
     working_directory: /tmp/app
 
     steps:
       - checkout
-      - setup_remote_docker
 
       - run:
           name: Build the image(s)
           command: |
-            docker build -t sirene:latest .
+            cp .env.sample .env
+            docker-compose build
 
       - run:
           name: Run quality
           command: |
-            docker run sirene make quality
+            docker-compose run --rm sirene make quality
 
       - run:
           name: Run test and coverage
           command: |
-            docker run sirene /bin/bash -c "make coverage; codecov --token=03f9df38-f1e3-4f0d-bfa1-0e8626319b14"
+            docker-compose run --rm sirene  /bin/bash -c "make coverage; codecov --token=03f9df38-f1e3-4f0d-bfa1-0e8626319b14"

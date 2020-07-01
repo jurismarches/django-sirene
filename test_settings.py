@@ -4,10 +4,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 SECRET_KEY = 'secret_for_tests'
 DEBUG = True
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": os.environ.get("POSTGRES_NAME"),
+        "USER": os.environ.get("POSTGRES_USER"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+        "HOST": "postgresql",
+        "PORT": "",
+        "ATOMIC_REQUESTS": True,
     }
 }
 INSTALLED_APPS = ('django_sirene',)
@@ -24,7 +30,7 @@ LOGGING = {
     'loggers': {
         'django_sirene': {
             'handlers': ['console'],
-            'level': os.getenv('LOG_LEVEL', 'INFO'),
+            'level': os.getenv('LOG_LEVEL', 'ERROR'),
         },
     },
 }

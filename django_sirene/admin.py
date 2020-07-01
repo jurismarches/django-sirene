@@ -5,6 +5,8 @@ from .models import Institution
 class InstitutionAdmin(admin.ModelAdmin):
     search_fields = (
         'siret',
+        "name",
+        "commercial_name"
     )
     list_select_related = (
         'legal_status',
@@ -22,7 +24,6 @@ class InstitutionAdmin(admin.ModelAdmin):
         'is_expired',
         'updated',
         'created',
-        'updated_from_filename',
     )
 
 

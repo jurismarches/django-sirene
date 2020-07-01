@@ -24,7 +24,6 @@ These are settings you will want to redefine::
 | Setting                            | Default | Details                                                 |
 | ---------------------------------- | ------- | ------------------------------------------------------- |
 | `DJANGO_SIRENE_LOCAL_PATH`         | `/tmp`  | define where files will be downloaded                   |
-| `DJANGO_SIRENE_DAYS_TO_KEEP_FILES` | `30`    | define how many days you want to keep downloaded files  |
 
 Make the migration
 ```
@@ -38,34 +37,34 @@ manage.py populate_sirene_database
 ```
 It will import the last 'stock' file then all next 'daily' files published.
 
-You can populate database at a past date with `at` parameter.
+You can see further option in the command help.
 ```
-manage.py populate_sirene_database --at '2017-11-30'
+manage.py populate_sirene_database --help'
 ```
 
 ## Contributing
 
-### Build, start and attach to docker container
+### Build, start docker container
 
 ```
-docker-compose up -d
-docker exec -ti CONTAINER_ID bash
+cp .env.sample .env
+docker-compose build
 ```
 
 ### Test django admin
 
 Create superuser
 ```
-example/manage.py createsuperuser
+docker-compose exec sirene example/manage.py createsuperuser
 ```
 
  Run django server
 ```
-example/manage.py runserver 0:8000
+docker-compose exec sirene example/manage.py runserver 0:8000
 ```
 
 ### Run tests
 
 ```
-make tests
+docker-compose run --rm sirene make tests
 ```
