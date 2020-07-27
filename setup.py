@@ -13,7 +13,6 @@ setup(
     packages=find_packages(),
     install_requires=[
         "django-bulk-update>=2.2.0",
-        "django-elasticsearch-dsl>=0.4.4",
     ],
     include_package_data=True,
     license='GPLv3 License',  # example license

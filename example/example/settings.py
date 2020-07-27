@@ -127,15 +127,6 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 
-ES_CONNECTIONS = {
-    'default': {
-        'hosts': [{
-            'host': 'elasticsearch',
-            'port': os.environ.get('ES_PORT', '9200'),
-        }]
-    }
-}
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
