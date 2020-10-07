@@ -6,7 +6,7 @@ from factory import fuzzy
 from .. import models
 
 
-class ActivityFactory(factory.DjangoModelFactory):
+class ActivityFactory(factory.django.DjangoModelFactory):
     code = fuzzy.FuzzyText(length=5)
     name = fuzzy.FuzzyText(length=10)
 
@@ -14,7 +14,7 @@ class ActivityFactory(factory.DjangoModelFactory):
         model = models.Activity
 
 
-class MunicipalityFactory(factory.DjangoModelFactory):
+class MunicipalityFactory(factory.django.DjangoModelFactory):
     code = fuzzy.FuzzyText(length=5)
     name = fuzzy.FuzzyText(length=10)
 
@@ -22,7 +22,7 @@ class MunicipalityFactory(factory.DjangoModelFactory):
         model = models.Municipality
 
 
-class LegalStatusFactory(factory.DjangoModelFactory):
+class LegalStatusFactory(factory.django.DjangoModelFactory):
     code = fuzzy.FuzzyText(length=4)
     name = fuzzy.FuzzyText(length=20)
 
@@ -30,7 +30,7 @@ class LegalStatusFactory(factory.DjangoModelFactory):
         model = models.LegalStatus
 
 
-class InstitutionFactory(factory.DjangoModelFactory):
+class InstitutionFactory(factory.django.DjangoModelFactory):
     siret = factory.Sequence(lambda n: '{}'.format(n).zfill(14))
 
     name = factory.Sequence(lambda n: 'name-{}'.format(n))

@@ -7,7 +7,7 @@ psycopg2
 
 # Testing
 coverage
-factory-boy
+factory-boy>=3
 flake8
 codecov
 mock
