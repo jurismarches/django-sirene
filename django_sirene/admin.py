@@ -21,7 +21,7 @@ class InstitutionAdmin(admin.ModelAdmin):
         "updated",
         "created",
     )
-    raw_id_fields = ("headquarter",)
+    raw_id_fields = ("headquarter", "legal_status", "municipality", "activity")
 
 
 admin.site.register(Institution, InstitutionAdmin)
